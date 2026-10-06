@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IELTS 30-Min Speaking Trial Lesson Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar & interactive polish */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .badge-pill { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title & Target Status -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-100">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight leading-none">IELTS Speaking Trial Assistant</h1>
+          <span class="text-xs text-slate-500 font-medium">30-Minute Structured Evaluation Platform</span>
+        </div>
+      </div>
+
+      <!-- Live Session Stopwatch & Tools -->
+      <div class="flex items-center gap-3">
+        <div class="bg-slate-100 rounded-xl p-1.5 flex items-center border border-slate-200/80">
+          <span class="text-xs font-medium text-slate-500 px-2 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Session:
+          </span>
+          <span id="sessionTimerDisplay" class="font-mono text-sm font-bold text-slate-800 px-2">00:00</span>
+          <button id="toggleSessionBtn" onclick="toggleSessionTimer()" class="p-1 rounded-lg text-xs bg-white shadow-sm border border-slate-200 hover:bg-slate-50 text-slate-700 px-2.5 transition">
+            Start
+          </button>
+          <button onclick="resetSessionTimer()" class="p-1 rounded-lg text-xs hover:bg-slate-200 text-slate-500 px-2 transition ml-1">
+            ↺
+          </button>
+        </div>
+
+        <button onclick="exportTrialSummary()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+          Copy Report
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column: Step Workflow -->
+    <div class="lg:col-span-8 flex flex-col space-y-6">
+
+      <!-- Stage Navigation Tabs -->
+      <nav class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex items-center overflow-x-auto space-x-1" aria-label="Stages">
+        <button onclick="switchTab(1)" id="tabBtn1" class="tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-center transition flex items-center justify-center gap-2 bg-indigo-50 text-indigo-700 font-semibold shadow-xs">
+          <span class="w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold">1</span>
+          Needs (0-5m)
+        </button>
+        <button onclick="switchTab(2)" id="tabBtn2" class="tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">2</span>
+          Part 1 (5-9m)
+        </button>
+        <button onclick="switchTab(3)" id="tabBtn3" class="tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">3</span>
+          Part 2 (9-17m)
+        </button>
+        <button onclick="switchTab(4)" id="tabBtn4" class="tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">4</span>
+          Feedback (17-24m)
+        </button>
+        <button onclick="switchTab(5)" id="tabBtn5" class="tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-2">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold">5</span>
+          Closing (24-30m)
+        </button>
+      </nav>
+
+      <section id="stage1" class="stage-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-indigo-600">Stage 1:</span> Student Intake & Diagnostic Goals
+            </h2>
+            <p class="text-xs text-slate-500">First 5 minutes — build confidence, qualify intent, and set the stage.</p>
+          </div>
+          <span class="badge-pill bg-slate-100 text-slate-700">00:00 - 05:00</span>
+        </div>
+
+        <div class="bg-indigo-50/70 border border-indigo-100 p-3.5 rounded-xl text-xs text-indigo-900 space-y-1">
+          <span class="font-semibold block uppercase tracking-wider text-[10px] text-indigo-600">Verbatim Tutor Script:</span>
+          <p class="italic">"Welcome! In this 30-minute session, we’ll run a fast mini-speaking mock test so I can evaluate your real-time performance, pin down your target gaps, and show you exactly how to reach your goal score."</p>
+        </div>
+
+        <!-- Student Intake Form Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Student Name</label>
+            <input type="text" id="studentName" placeholder="e.g. Maria Silva" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Test Type</label>
+            <select id="testType" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="Academic">Academic (University / Professional)</option>
+              <option value="General Training">General Training (Migration / Work)</option>
+              <option value="Undecided">Undecided / Exploring</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Band Score</label>
+            <select id="targetScore" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              <option value="6.5">Band 6.5 (Standard Competent)</option>
+              <option value="7.0" selected>Band 7.0 (Good User / High Admission)</option>
+              <option value="7.5">Band 7.5 (Advanced)</option>
+              <option value="8.0+">Band 8.0+ (Superior / Medical Registries)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Exam Date / Deadline</label>
+            <input type="text" id="examDeadline" placeholder="e.g. Next month, Nov 15th" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Pre-Select Part 2 Cue Card Topic at Start -->
+        <div class="pt-3 border-t border-slate-100">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <label class="block text-xs font-bold text-slate-800">Part 2 Cue Card Topic (Pre-Select for Session):</label>
+              <p class="text-[11px] text-slate-500">Pick upfront or let the student choose their preferred topic</p>
+            </div>
+            <button type="button" onclick="randomizeCueCard()" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+              🎲 Random Topic
+            </button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="stage1CardSelector">
+            <button type="button" onclick="selectCueCard(0)" id="startCardBtn0" class="p-3 text-left rounded-xl border text-xs font-medium transition bg-indigo-50 border-indigo-400 text-indigo-800 ring-2 ring-indigo-500/20 shadow-xs">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[10px] uppercase tracking-wide text-indigo-600">Topic 1 (Life Event)</span>
+                <span id="startCardBadge0" class="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold">Selected</span>
+              </div>
+              <span class="block font-semibold text-slate-800 text-xs">An important decision</span>
+              <span class="text-[10px] text-slate-500 block truncate mt-0.5">Life event, choices, impact</span>
+            </button>
+            <button type="button" onclick="selectCueCard(1)" id="startCardBtn1" class="p-3 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[10px] uppercase tracking-wide text-slate-500">Topic 2 (Person)</span>
+                <span id="startCardBadge1" class="text-[10px] hidden bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold">Selected</span>
+              </div>
+              <span class="block font-semibold text-slate-800 text-xs">An inspiring mentor</span>
+              <span class="text-[10px] text-slate-500 block truncate mt-0.5">Person, role model, influence</span>
+            </button>
+            <button type="button" onclick="selectCueCard(2)" id="startCardBtn2" class="p-3 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-[10px] uppercase tracking-wide text-slate-500">Topic 3 (Travel)</span>
+                <span id="startCardBadge2" class="text-[10px] hidden bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold">Selected</span>
+              </div>
+              <span class="block font-semibold text-slate-800 text-xs">A memorable city / place</span>
+              <span class="text-[10px] text-slate-500 block truncate mt-0.5">Travel, culture, impressions</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button onclick="switchTab(2)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            Proceed to Part 1 Mock &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section id="stage2" class="stage-card hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-indigo-600">Stage 2:</span> Part 1 Mini-Interview
+            </h2>
+            <p class="text-xs text-slate-500">4 Minutes — 3-4 natural conversational questions. Listen for fluency and sentence length.</p>
+          </div>
+          <span class="badge-pill bg-slate-100 text-slate-700">05:00 - 09:00</span>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-900">
+          <strong class="font-semibold">Tutor Tip:</strong> Aim for 2–4 sentences per answer. If the student gives single-word replies, prompt them with "Why?" or "Can you elaborate?". If they ramble beyond 40 seconds, gently move to the next question.
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-300 transition">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Topic 1: Study or Work</span>
+            <p class="text-sm font-medium text-slate-800 mt-1">"Do you currently work or are you studying? What do you enjoy most about it?"</p>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-300 transition">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Topic 2: Hometown / Living Area</span>
+            <p class="text-sm font-medium text-slate-800 mt-1">"What is the best thing about living in your current city or town?"</p>
+          </div>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 hover:border-indigo-300 transition">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Topic 3: Habits & Routines</span>
+            <p class="text-sm font-medium text-slate-800 mt-1">"What time of day do you find yourself most productive, and why?"</p>
+          </div>
+        </div>
+
+        <div class="flex justify-between pt-2">
+          <button onclick="switchTab(1)" class="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-medium transition">
+            &larr; Back
+          </button>
+          <button onclick="switchTab(3)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            Proceed to Part 2 Cue Card &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section id="stage3" class="stage-card hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-indigo-600">Stage 3:</span> Part 2 Cue Card Long Turn
+            </h2>
+            <p class="text-xs text-slate-500">1 Minute Prep + Up to 2 Minutes Independent Speaking</p>
+          </div>
+          <span class="badge-pill bg-slate-100 text-slate-700">09:00 - 17:00</span>
+        </div>
+
+        <!-- Cue Card Selector Tabs -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Select Candidate Topic:</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="cueCardSelector">
+            <button type="button" onclick="selectCueCard(0)" id="cardBtn0" class="p-2 text-left rounded-xl border text-xs font-medium transition bg-indigo-50 border-indigo-300 text-indigo-700 shadow-xs">
+              <span class="block font-bold text-[11px] text-indigo-600">Topic 1 (Life Decision)</span>
+              <span class="truncate block text-slate-700">An important decision</span>
+            </button>
+            <button type="button" onclick="selectCueCard(1)" id="cardBtn1" class="p-2 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+              <span class="block font-bold text-[11px] text-slate-500">Topic 2 (Person)</span>
+              <span class="truncate block text-slate-700">An inspiring mentor</span>
+            </button>
+            <button type="button" onclick="selectCueCard(2)" id="cardBtn2" class="p-2 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+              <span class="block font-bold text-[11px] text-slate-500">Topic 3 (Travel / Place)</span>
+              <span class="truncate block text-slate-700">A memorable city / place</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cue Card Box (Student Shareable View) -->
+        <div class="bg-gradient-to-br from-slate-900 to-indigo-950 text-white p-5 rounded-2xl shadow-md border border-slate-800">
+          <div class="flex justify-between items-start mb-2">
+            <span id="cueCardCategory" class="text-[11px] font-semibold tracking-wider uppercase text-indigo-300 bg-indigo-900/60 px-2 py-0.5 rounded-full border border-indigo-500/30">Candidate Cue Card • Life Event</span>
+            <span class="text-xs text-slate-300">1-2 Minutes Speech</span>
+          </div>
+          <h3 id="cueCardTitle" class="text-base sm:text-lg font-bold text-white mb-2">Describe an important decision you made recently.</h3>
+          <p class="text-xs text-slate-300 mb-2">You should say:</p>
+          <ul id="cueCardPrompts" class="text-xs sm:text-sm text-slate-200 space-y-1.5 ml-4 list-disc">
+            <li>What the decision was</li>
+            <li>When and why you made it</li>
+            <li>How difficult or easy it was to decide</li>
+            <li>And explain how you felt after making this decision.</li>
+          </ul>
+
+          <!-- Tutor Listening Guide / Target Vocabulary -->
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-1.5 text-[11px] text-slate-300">
+            <span class="font-bold text-indigo-300">Band 7+ Collocations to listen for:</span>
+            <span id="cueCardVocab" class="text-slate-300 italic font-mono">a tough call, weigh up the pros and cons, life-altering, have second thoughts</span>
+          </div>
+        </div>
+
+        <!-- Part 2 Interactive Timers (Tone.js Chime) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- 1 Minute Prep Box -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center">
+            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Preparation Time (1:00)</span>
+            <div id="prepDisplay" class="font-mono text-3xl font-extrabold text-indigo-600 my-2">01:00</div>
+            <div class="flex gap-2">
+              <button onclick="startCountdown(60, 'prepDisplay', 'Prep Complete!')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-lg transition">Start Prep</button>
+              <button onclick="resetCountdown('prepDisplay', '01:00')" class="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition">Reset</button>
+            </div>
+          </div>
+
+          <!-- 2 Minute Speech Box -->
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center text-center">
+            <span class="text-xs font-semibold text-slate-600 uppercase tracking-wide">Speaking Turn (2:00)</span>
+            <div id="speechDisplay" class="font-mono text-3xl font-extrabold text-emerald-600 my-2">02:00</div>
+            <div class="flex gap-2">
+              <button onclick="startCountdown(120, 'speechDisplay', 'Time is up!')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition">Start Speaking</button>
+              <button onclick="resetCountdown('speechDisplay', '02:00')" class="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-100 transition">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between pt-2">
+          <button onclick="switchTab(2)" class="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-medium transition">
+            &larr; Back
+          </button>
+          <button onclick="switchTab(4)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            Proceed to Band Feedback &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section id="stage4" class="stage-card hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-indigo-600">Stage 4:</span> 4-Pillar Diagnostic Scoring
+            </h2>
+            <p class="text-xs text-slate-500">Rate candidate across official IELTS descriptors. This generates your exact feedback.</p>
+          </div>
+          <span class="badge-pill bg-slate-100 text-slate-700">17:00 - 24:00</span>
+        </div>
+
+        <!-- 4 Criteria Scoring Sliders & Observations -->
+        <div class="space-y-4">
+          <!-- 1. Fluency & Coherence -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-xs font-bold text-slate-900">1. Fluency and Coherence (FC)</span>
+                <p class="text-[11px] text-slate-500">Flow, hesitation, repetition, and logical linkers</p>
+              </div>
+              <div class="flex items-center gap-1 font-mono font-bold text-indigo-600 text-sm">
+                Band: <span id="scoreValFC">6.0</span>
+              </div>
+            </div>
+            <input type="range" min="4.5" max="8.5" step="0.5" value="6.0" oninput="updateScore('FC', this.value)" class="w-full accent-indigo-600 cursor-pointer">
+            <input type="text" id="noteFC" placeholder="e.g. Good pacing initially, but paused often looking for words in Part 2" class="w-full text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white">
+          </div>
+
+          <!-- 2. Lexical Resource -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-xs font-bold text-slate-900">2. Lexical Resource (LR)</span>
+                <p class="text-[11px] text-slate-500">Vocabulary variety, collocations, precision & idiomatic use</p>
+              </div>
+              <div class="flex items-center gap-1 font-mono font-bold text-indigo-600 text-sm">
+                Band: <span id="scoreValLR">6.0</span>
+              </div>
+            </div>
+            <input type="range" min="4.5" max="8.5" step="0.5" value="6.0" oninput="updateScore('LR', this.value)" class="w-full accent-indigo-600 cursor-pointer">
+            <input type="text" id="noteLR" placeholder="e.g. Repetition of 'good' and 'hard'. Needs collocations like 'a tough call'." class="w-full text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white">
+          </div>
+
+          <!-- 3. Grammatical Range & Accuracy -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-xs font-bold text-slate-900">3. Grammatical Range & Accuracy (GRA)</span>
+                <p class="text-[11px] text-slate-500">Simple vs complex sentences, conditionals, tense consistency</p>
+              </div>
+              <div class="flex items-center gap-1 font-mono font-bold text-indigo-600 text-sm">
+                Band: <span id="scoreValGRA">5.5</span>
+              </div>
+            </div>
+            <input type="range" min="4.5" max="8.5" step="0.5" value="5.5" oninput="updateScore('GRA', this.value)" class="w-full accent-indigo-600 cursor-pointer">
+            <input type="text" id="noteGRA" placeholder="e.g. Past tense slips; mostly basic compound sentences, lacking conditional clauses" class="w-full text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white">
+          </div>
+
+          <!-- 4. Pronunciation -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+            <div class="flex justify-between items-center">
+              <div>
+                <span class="text-xs font-bold text-slate-900">4. Pronunciation (PR)</span>
+                <p class="text-[11px] text-slate-500">Intonation, word stress, clarity, and overall intelligibility</p>
+              </div>
+              <div class="flex items-center gap-1 font-mono font-bold text-indigo-600 text-sm">
+                Band: <span id="scoreValPR">6.5</span>
+              </div>
+            </div>
+            <input type="range" min="4.5" max="8.5" step="0.5" value="6.5" oninput="updateScore('PR', this.value)" class="w-full accent-indigo-600 cursor-pointer">
+            <input type="text" id="notePR" placeholder="e.g. Clear accent; work on natural sentence rhythm and word stress" class="w-full text-xs px-3 py-1.5 border border-slate-200 rounded-lg bg-white">
+          </div>
+        </div>
+
+        <!-- Calculated Overall Diagnostic -->
+        <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-indigo-900 uppercase tracking-wide">Estimated Baseline Speaking Band</span>
+            <p class="text-xs text-indigo-700">Calculated average rounded to nearest 0.5 IELTS band</p>
+          </div>
+          <div class="font-mono text-2xl font-black text-indigo-700" id="overallBandDisplay">6.0</div>
+        </div>
+
+        <div class="flex justify-between pt-2">
+          <button onclick="switchTab(3)" class="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-medium transition">
+            &larr; Back
+          </button>
+          <button onclick="switchTab(5)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+            Finalize Action Plan & Closing &rarr;
+          </button>
+        </div>
+      </section>
+
+      <section id="stage5" class="stage-card hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-indigo-600">Stage 5:</span> Action Plan & Conversion Script
+            </h2>
+            <p class="text-xs text-slate-500">24:00 - 30:00 — Turn diagnosis into a clear, high-converting ongoing curriculum.</p>
+          </div>
+          <span class="badge-pill bg-slate-100 text-slate-700">24:00 - 30:00</span>
+        </div>
+
+        <!-- Verbatim Closing Transition Script -->
+        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Tutor Script for Closing:</span>
+          <p class="text-xs sm:text-sm text-emerald-900 leading-relaxed italic">
+            "Your ideas are natural and you have good baseline comprehension. However, the reason you are at Band <span id="closingCurBand" class="font-bold">6.0</span> rather than your target of Band <span id="closingTargetBand" class="font-bold">7.0</span> is primarily vocabulary breadth and complex grammar structures. In our regular lessons, we will directly target these high-scoring collocations and run Part 3 abstract debates. How does this strategy sound to you?"
+          </p>
+        </div>
+
+        <!-- Custom Action Plan Checklist -->
+        <div class="space-y-3">
+          <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wide">Key Study Plan Recommendations:</h3>
+          <div class="space-y-2 text-xs">
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" checked class="rounded text-indigo-600 focus:ring-0">
+              <span><strong>Collocation Booster:</strong> Replace general words ('good', 'difficult') with high-band idioms and topic collocations.</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" checked class="rounded text-indigo-600 focus:ring-0">
+              <span><strong>Complex Clause Mastery:</strong> Drill 2nd/3rd conditionals and concessive clauses ('Even though...', 'Had I chosen...')</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" checked class="rounded text-indigo-600 focus:ring-0">
+              <span><strong>Part 3 Abstract Extension:</strong> Train the P-E-E-L framework (Point, Explain, Example, Link) for questions on society/technology.</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100">
+              <input type="checkbox" class="rounded text-indigo-600 focus:ring-0">
+              <span><strong>Writing / Reading Modules:</strong> Expand trial focus into Task 2 academic essay writing and Reading speed skimming.</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-wrap gap-3 items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-800">Ready to deliver feedback?</span>
+            <p class="text-xs text-slate-500">Copy the full formatted student diagnostic report to your clipboard.</p>
+          </div>
+          <button onclick="exportTrialSummary()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+            </svg>
+            Copy Full Report
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="lg:col-span-4 flex flex-col space-y-6">
+
+      <!-- Scratchpad for instant error catching -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col h-auto">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Tutor Scratchpad
+          </span>
+          <button onclick="clearScratchpad()" class="text-[10px] text-slate-400 hover:text-red-500 font-medium transition">Clear</button>
+        </div>
+        <textarea id="liveNotes" rows="10" placeholder="Type student errors, mispronounced words, or exact phrases as they speak...&#10;&#10;e.g.&#10;• Said: 'I am agree' -> Correct: 'I agree'&#10;• Mispronounced: 'comfortable'&#10;• Good idiom used: 'once in a blue moon'" class="w-full text-xs font-mono p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none bg-slate-50/50"></textarea>
+      </div>
+
+      <!-- Quick Criteria Band Reference Widget -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">IELTS Band Descriptors At A Glance</h3>
+        <div class="space-y-2 text-[11px] text-slate-600">
+          <div class="p-2 bg-slate-50 rounded-lg">
+            <strong class="text-slate-800">Band 6.0:</strong> Willing to speak at length; may lose coherence at times; basic vocabulary suffices; mixed simple & complex sentences.
+          </div>
+          <div class="p-2 bg-indigo-50/70 border border-indigo-100 rounded-lg text-indigo-950">
+            <strong class="text-indigo-800">Band 7.0:</strong> Speaks effortlessly without noticeable effort; uses flexible vocabulary & idioms with some slips; frequent error-free complex sentences.
+          </div>
+          <div class="p-2 bg-slate-50 rounded-lg">
+            <strong class="text-slate-800">Band 8.0:</strong> Fluent with only rare hesitation; wide lexical resource with subtle nuances; wide range of complex structures consistently accurate.
+          </div>
+        </div>
+      </div>
+
+      <!-- Audio Cue Sound Status -->
+      <div class="p-3 bg-slate-100/80 rounded-xl border border-slate-200 text-[11px] text-slate-500 flex items-center justify-between">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+          </svg>
+          Chime notifications enabled (Tone.js)
+        </span>
+        <button onclick="testChime()" class="text-indigo-600 hover:underline font-medium">Test</button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2 z-50">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span id="toastMsg">Action completed</span>
+  </div>
+
+  <script>
+    /* State tracking */
+    let sessionSeconds = 0;
+    let sessionInterval = null;
+    let activeCountdownInterval = null;
+
+    const cueCards = [
+      {
+        tag: "Life Event / Decision",
+        title: "Describe an important decision you made recently.",
+        prompts: [
+          "What the decision was",
+          "When and why you made it",
+          "How difficult or easy it was to decide",
+          "And explain how you felt after making this decision."
+        ],
+        vocab: "a tough call, weigh up the pros and cons, life-altering, have second thoughts, stand by my decision"
+      },
+      {
+        tag: "People & Inspiration",
+        title: "Describe a person who has inspired you or made a positive impact on your life.",
+        prompts: [
+          "Who this person is and how you know them",
+          "What kind of person they are",
+          "What they did that inspired or helped you",
+          "And explain why this person had such a strong impact on you."
+        ],
+        vocab: "role model, emulate, persevere through adversity, pillar of strength, leave an indelible mark"
+      },
+      {
+        tag: "Places & Travel Experience",
+        title: "Describe an interesting place or city you have visited that left a strong impression.",
+        prompts: [
+          "Where this place is and when you went there",
+          "What you did and saw while you were there",
+          "Who you went with",
+          "And explain why this place made such a lasting impression on you."
+        ],
+        vocab: "breathtaking scenery, hustle and bustle, off the beaten track, steeped in history, picturesque"
+      }
+    ];
+
+    let currentCardIndex = 0;
+
+    function selectCueCard(index) {
+      currentCardIndex = index;
+      const card = cueCards[index];
+
+      // Update Card Content in Stage 3
+      document.getElementById('cueCardCategory').textContent = `Candidate Cue Card • ${card.tag}`;
+      document.getElementById('cueCardTitle').textContent = card.title;
+      document.getElementById('cueCardVocab').textContent = card.vocab;
+
+      const promptsList = document.getElementById('cueCardPrompts');
+      promptsList.innerHTML = card.prompts.map(p => `<li>${p}</li>`).join('');
+
+      // Update Stage 1 start selector buttons
+      for (let i = 0; i < cueCards.length; i++) {
+        const startBtn = document.getElementById(`startCardBtn${i}`);
+        const badge = document.getElementById(`startCardBadge${i}`);
+        if (startBtn) {
+          const startTag = startBtn.querySelector('span:first-child');
+          if (i === index) {
+            startBtn.className = 'p-3 text-left rounded-xl border text-xs font-medium transition bg-indigo-50 border-indigo-400 text-indigo-800 ring-2 ring-indigo-500/20 shadow-xs';
+            if (startTag) startTag.className = 'font-bold text-[10px] uppercase tracking-wide text-indigo-600';
+            if (badge) badge.classList.remove('hidden');
+          } else {
+            startBtn.className = 'p-3 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50';
+            if (startTag) startTag.className = 'font-bold text-[10px] uppercase tracking-wide text-slate-500';
+            if (badge) badge.classList.add('hidden');
+          }
+        }
+
+        // Update Stage 3 selector buttons
+        const btn = document.getElementById(`cardBtn${i}`);
+        if (btn) {
+          const tagText = btn.querySelector('span:first-child');
+          if (i === index) {
+            btn.className = 'p-2 text-left rounded-xl border text-xs font-medium transition bg-indigo-50 border-indigo-300 text-indigo-700 shadow-xs';
+            if (tagText) tagText.className = 'block font-bold text-[11px] text-indigo-600';
+          } else {
+            btn.className = 'p-2 text-left rounded-xl border text-xs font-medium transition bg-white border-slate-200 text-slate-600 hover:bg-slate-50';
+            if (tagText) tagText.className = 'block font-bold text-[11px] text-slate-500';
+          }
+        }
+      }
+    }
+
+    function randomizeCueCard() {
+      const nextIdx = Math.floor(Math.random() * cueCards.length);
+      selectCueCard(nextIdx);
+      showToast(`Selected: "${cueCards[nextIdx].title}"`);
+    }
+
+    const scores = {
+      FC: 6.0,
+      LR: 6.0,
+      GRA: 5.5,
+      PR: 6.5
+    };
+
+    /* Sound Synthesizer via Tone.js */
+    let synth;
+    function getSynth() {
+      if (!synth) {
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -8;
+      }
+      return synth;
+    }
+
+    function playChime() {
+      try {
+        Tone.start();
+        const s = getSynth();
+        s.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+      } catch (e) {
+        console.log("Audio not allowed or blocked");
+      }
+    }
+
+    function testChime() {
+      playChime();
+      showToast("Sound chime tested successfully!");
+    }
+
+    /* Overall 30-Min Session Stopwatch */
+    function toggleSessionTimer() {
+      const btn = document.getElementById('toggleSessionBtn');
+      if (sessionInterval) {
+        clearInterval(sessionInterval);
+        sessionInterval = null;
+        btn.textContent = 'Resume';
+        btn.classList.remove('bg-amber-100', 'text-amber-800');
+      } else {
+        sessionInterval = setInterval(() => {
+          sessionSeconds++;
+          const mins = String(Math.floor(sessionSeconds / 60)).padStart(2, '0');
+          const secs = String(sessionSeconds % 60).padStart(2, '0');
+          document.getElementById('sessionTimerDisplay').textContent = `${mins}:${secs}`;
+          
+          // Visual warning at 25 and 30 mins
+          if (sessionSeconds === 1500) { // 25 min
+            showToast("5 minutes remaining in trial session!");
+          }
+        }, 1000);
+        btn.textContent = 'Pause';
+        btn.classList.add('bg-amber-100', 'text-amber-800');
+      }
+    }
+
+    function resetSessionTimer() {
+      clearInterval(sessionInterval);
+      sessionInterval = null;
+      sessionSeconds = 0;
+      document.getElementById('sessionTimerDisplay').textContent = '00:00';
+      const btn = document.getElementById('toggleSessionBtn');
+      btn.textContent = 'Start';
+      btn.classList.remove('bg-amber-100', 'text-amber-800');
+    }
+
+    /* Countdown timer helper for Part 2 */
+    function startCountdown(totalSeconds, displayId, completionMsg) {
+      if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+      let rem = totalSeconds;
+      const el = document.getElementById(displayId);
+      
+      activeCountdownInterval = setInterval(() => {
+        rem--;
+        const m = String(Math.floor(rem / 60)).padStart(2, '0');
+        const s = String(rem % 60).padStart(2, '0');
+        el.textContent = `${m}:${s}`;
+
+        if (rem <= 0) {
+          clearInterval(activeCountdownInterval);
+          activeCountdownInterval = null;
+          playChime();
+          showToast(completionMsg);
+          el.textContent = "00:00";
+        }
+      }, 1000);
+    }
+
+    function resetCountdown(displayId, defaultVal) {
+      if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+      document.getElementById(displayId).textContent = defaultVal;
+    }
+
+    /* Tab switcher */
+    function switchTab(step) {
+      for (let i = 1; i <= 5; i++) {
+        const stage = document.getElementById(`stage${i}`);
+        const btn = document.getElementById(`tabBtn${i}`);
+        if (i === step) {
+          stage.classList.remove('hidden');
+          btn.className = 'tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-semibold text-center transition flex items-center justify-center gap-2 bg-indigo-50 text-indigo-700 shadow-xs';
+          btn.querySelector('span').className = 'w-5 h-5 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center font-bold';
+        } else {
+          stage.classList.add('hidden');
+          btn.className = 'tab-button flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-2';
+          btn.querySelector('span').className = 'w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] flex items-center justify-center font-bold';
+        }
+      }
+      // Update target band sync in stage 5
+      const target = document.getElementById('targetScore').value;
+      document.getElementById('closingTargetBand').textContent = target;
+    }
+
+    /* Updating diagnostic scores */
+    function updateScore(criterion, val) {
+      scores[criterion] = parseFloat(val);
+      document.getElementById(`scoreVal${criterion}`).textContent = parseFloat(val).toFixed(1);
+
+      // Recalculate average
+      const avg = (scores.FC + scores.LR + scores.GRA + scores.PR) / 4;
+      // IELTS rounding rule: e.g. 6.25 -> 6.5, 6.75 -> 7.0
+      const rounded = Math.round(avg * 2) / 2;
+      document.getElementById('overallBandDisplay').textContent = rounded.toFixed(1);
+      document.getElementById('closingCurBand').textContent = rounded.toFixed(1);
+    }
+
+    /* Scratchpad helper */
+    function clearScratchpad() {
+      document.getElementById('liveNotes').value = '';
+      showToast('Scratchpad cleared');
+    }
+
+    /* Summary Report Exporter */
+    function exportTrialSummary() {
+      const name = document.getElementById('studentName').value.trim() || 'Candidate';
+      const test = document.getElementById('testType').value;
+      const target = document.getElementById('targetScore').value;
+      const curBand = document.getElementById('overallBandDisplay').textContent;
+      const notes = document.getElementById('liveNotes').value.trim();
+      const cardTopic = cueCards[currentCardIndex].title;
+
+      const report = `=========================================
+IELTS SPEAKING TRIAL DIAGNOSTIC REPORT
+=========================================
+Student: ${name}
+Target Exam: ${test} | Target Band: ${target}
+Assessed Baseline Band: Band ${curBand}
+Part 2 Topic Evaluated: "${cardTopic}"
+
+BREAKDOWN BY CRITERIA:
+• Fluency & Coherence: Band ${scores.FC.toFixed(1)}
+  Note: ${document.getElementById('noteFC').value || 'Baseline tested'}
+• Lexical Resource: Band ${scores.LR.toFixed(1)}
+  Note: ${document.getElementById('noteLR').value || 'Needs collocations and idiomatic range'}
+• Grammatical Range & Accuracy: Band ${scores.GRA.toFixed(1)}
+  Note: ${document.getElementById('noteGRA').value || 'Focus on complex and conditional sentences'}
+• Pronunciation: Band ${scores.PR.toFixed(1)}
+  Note: ${document.getElementById('notePR').value || 'Focus on sentence stress & rhythm'}
+
+LIVE OBSERVATIONS & ERROR LOG:
+${notes || 'No specific notes logged.'}
+
+RECOMMENDED ACTION PLAN:
+1. Targeted Lexical Drills (Band 7.0+ Collocations)
+2. Complex Clause Frameworks (Conditional & Concessive)
+3. Part 3 Structured Extension (PEEL method)
+=========================================`;
+
+      // Copy to clipboard fallback
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = report;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try {
+        document.execCommand("copy");
+        showToast("Diagnostic report copied to clipboard!");
+      } catch (err) {
+        showToast("Error copying report");
+      }
+      document.body.removeChild(tempTextArea);
+    }
+
+    /* Visual Toast */
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // Initialize initial calculations
+    window.onload = function() {
+      selectCueCard(0);
+      updateScore('FC', 6.0);
+    };
+  </script>
+</body>
+</html>
